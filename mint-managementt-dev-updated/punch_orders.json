@@ -1,0 +1,75 @@
+[
+    {
+        "client_name": "kapil",
+        "client_email": "kapil@gmail.com",
+        "client_phone": "6767553456",
+        "client_address": "hghgfgh",
+        "shoes": [
+            {
+                "shoe_type": "casual",
+                "quantity": "100",
+                "key_pairs_per_ctn": "50",
+                "size_range": "9",
+                "material": "leather",
+                "color": "black",
+                "custom_price": "500",
+                "production_time": "5"
+            }
+        ],
+        "approval_status": true,
+        "additional_notes": "na",
+        "orderId": 1
+    },
+    {
+        "client_name": "love",
+        "client_email": "abc@gmail.com",
+        "client_phone": "9748368732",
+        "client_address": "delhi",
+        "shoes": [
+            {
+                "shoe_type": "party",
+                "quantity": "100",
+                "key_pairs_per_ctn": "50",
+                "size_range": "10",
+                "material": "clothes",
+                "color": "blue",
+                "custom_price": "100",
+                "production_time": "10"
+            }
+        ],
+        "approval_status": true,
+        "additional_notes": "nothing",
+        "orderId": 2
+    },
+    {
+        "client_name": "Spark Footwear",
+        "client_email": "sparkfootwear@gmail.com",
+        "client_phone": "7894563210",
+        "client_address": "Delhi",
+        "shoes": [
+            {
+                "shoe_type": "Leather",
+                "quantity": "4",
+                "key_pairs_per_ctn": "4",
+                "size_range": "6-10",
+                "material": "Leather",
+                "color": "Brown",
+                "custom_price": "250",
+                "production_time": "6"
+            },
+            {
+                "shoe_type": "Synthetic",
+                "quantity": "4",
+                "key_pairs_per_ctn": "4",
+                "size_range": "6-10",
+                "material": "Synthetic",
+                "color": "Blue",
+                "custom_price": "200",
+                "production_time": "6"
+            }
+        ],
+        "approval_status": false,
+        "additional_notes": "",
+        "orderId": 3
+    }
+]

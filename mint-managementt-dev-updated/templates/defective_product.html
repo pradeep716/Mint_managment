@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Defective Products</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      form {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        color: #333;
+      }
+      select,
+      input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        color: #333;
+      }
+      button {
+        width: 100%;
+        padding: 12px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+      table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+      tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+      a {
+        text-align: center;
+        display: block;
+        margin-top: 20px;
+      }
+      a button {
+        background-color: #007bff;
+        color: white;
+      }
+      a button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Manage Defective Products</h1>
+
+    <!-- Form for managing defective products -->
+    <form action="/defective-product" method="post">
+      <label for="product_class">Select Product Class:</label>
+      <select
+        name="product_class"
+        id="product_class"
+        onchange="filterProducts()"
+      >
+        <option value="">--Select Product Class--</option>
+        {% for cls in product_classes %}
+        <option value="{{ cls }}">{{ cls }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="product_id">Select Product:</label>
+      <select name="product_id" id="product_id" onchange="displayDefaultUnit()">
+        <option value="">--Select Product--</option>
+      </select>
+
+      <label for="unit">Select Unit:</label>
+      <select name="unit" id="unit">
+        <option value="g">Grams (g)</option>
+        <option value="kg">Kilograms (kg)</option>
+        <option value="ml">Milliliters (ml)</option>
+        <option value="L">Liters (L)</option>
+        <option value="pcs">Pieces (pcs)</option>
+      </select>
+
+      <label for="quantity">Defective Quantity:</label>
+      <input type="number" name="quantity" id="quantity" required step="0.01" />
+
+      <button type="submit">Record Defective Product</button>
+    </form>
+
+    <!-- Defective product history -->
+    <h2>Defective Product History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Defective ID</th>
+          <th>Product ID</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for id, entry in defective_history.items() %}
+        <tr>
+          <td>{{ id }}</td>
+          <td>{{ entry['product_id'] }}</td>
+          <td>{{ entry['quantity'] }}</td>
+          <td>{{ entry['unit'] }}</td>
+          <td>{{ entry['date_time'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Button to go back to the dashboard -->
+    <a href="/enterprise_dashboard">
+      <button type="button">Go to Dashboard</button>
+    </a>
+
+    <!-- JavaScript to filter products and show default unit -->
+    <script>
+      function filterProducts() {
+          const productClass = document.getElementById('product_class').value;
+          const products = {{ products | tojson }};
+          const productSelect = document.getElementById('product_id');
+
+          productSelect.innerHTML = '<option value="">--Select Product--</option>'; // Reset options
+
+          for (const [productId, details] of Object.entries(products)) {
+              if (details.product_class === productClass) {
+                  const option = document.createElement('option');
+                  option.value = productId;
+                  option.textContent = productId;
+                  productSelect.appendChild(option);
+              }
+          }
+      }
+
+      function displayDefaultUnit() {
+          const productId = document.getElementById('product_id').value;
+          const products = {{ products | tojson }};
+          const defaultUnitSelect = document.getElementById('unit');
+
+          if (productId in products) {
+              const productUnit = products[productId].unit;
+              const options = defaultUnitSelect.options;
+
+              for (let i = 0; i < options.length; i++) {
+                  if (options[i].value === productUnit) {
+                      options[i].selected = true;
+                  }
+              }
+          }
+      }
+    </script>
+  </body>
+</html>

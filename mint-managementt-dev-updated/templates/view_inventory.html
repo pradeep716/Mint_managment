@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>View Inventory</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 80%;
+        margin: auto;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      h2 {
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+      .expandable-section {
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+      }
+      .expandable-section button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 16px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+      .expandable-section button:hover {
+        background-color: #0056b3;
+      }
+      .expandable-content,
+      .nested-expandable-content {
+        display: none;
+        margin-top: 10px;
+      }
+      .expandable-content table,
+      .nested-expandable-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      .expandable-content table th,
+      .expandable-content table td,
+      .nested-expandable-content table th,
+      .nested-expandable-content table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      .expandable-content table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+      }
+      .search-bar {
+        margin: 20px 0;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+      .search-bar input,
+      .search-bar select {
+        width: calc(100% - 22px); /* Adjust width to fit within the container */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      .search-bar button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+      .search-bar button:hover {
+        background-color: #0056b3;
+      }
+      .export-button {
+        margin: 20px 0;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      .export-button:hover {
+        background-color: #218838;
+      }
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+      a:hover {
+        background-color: #0056b3;
+      }
+      .table-container {
+        overflow-x: auto;
+      }
+      .no-orders {
+        text-align: center;
+        color: #999;
+        padding: 20px;
+        font-size: 16px;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+      function toggleSection(button) {
+        var content = button.nextElementSibling;
+        var isExpanded = content.style.display === "block";
+
+        // Close all expandable sections
+        document
+          .querySelectorAll(".expandable-content")
+          .forEach(function (section) {
+            section.style.display = "none";
+            section.previousElementSibling.textContent = "Expand Section";
+          });
+
+        // If it was not expanded, open it
+        if (!isExpanded) {
+          content.style.display = "block";
+          button.textContent = "Collapse Section";
+        }
+      }
+
+      function toggleNestedSection(button) {
+        var row = button.closest("tr").nextElementSibling;
+        var content = row.querySelector(".nested-expandable-content");
+        var isExpanded = content.style.display === "block";
+
+        // Toggle the nested expandable content
+        if (isExpanded) {
+          content.style.display = "none";
+          button.textContent = "View Product Inventory";
+        } else {
+          content.style.display = "block";
+          button.textContent = "Hide Product Inventory";
+        }
+      }
+
+      async function exportToPDF(button) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let content;
+
+        if (button.dataset.type === "class") {
+          // Export entire product class inventory
+          content = document.querySelector(".expandable-content");
+        } else {
+          // Export specific product class inventory
+          const section = button.closest(".nested-expandable-content");
+          content = section.querySelector("table");
+        }
+
+        if (!content) {
+          alert("No content to export!");
+          return;
+        }
+
+        // Use html2canvas to capture the content
+        try {
+          const canvas = await html2canvas(content, { scale: 2 });
+          const imgData = canvas.toDataURL("image/png");
+
+          // Add the image to the PDF
+          doc.addImage(imgData, "PNG", 10, 10, 190, 0);
+          doc.save(
+            button.dataset.type === "class"
+              ? "product_class_inventory.pdf"
+              : "product_inventory.pdf"
+          );
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+        }
+      }
+
+      function filterProducts(input) {
+        const searchTerm = input.value.toLowerCase();
+        const table = input
+          .closest(".nested-expandable-content")
+          .querySelector("table");
+        const rows = table.getElementsByTagName("tr");
+
+        // Start from index 1 to skip the header row
+        for (let i = 1; i < rows.length; i++) {
+          const productId = rows[i].getElementsByTagName("td")[0];
+          if (productId) {
+            const text = productId.textContent || productId.innerText;
+            if (text.toLowerCase().includes(searchTerm)) {
+              rows[i].style.display = "";
+            } else {
+              rows[i].style.display = "none";
+            }
+          }
+        }
+      }
+      function filterProductsClass(input) {
+        const searchTerm = input.value.toLowerCase();
+        const table = input
+          .closest(".expandable-content")
+          .querySelector("table");
+        const rows = table.getElementsByTagName("tr");
+
+        // Start from index 1 to skip the header row
+        for (let i = 1; i < rows.length; i++) {
+          const productClass = rows[i].getElementsByTagName("td")[0];
+          if (productClass) {
+            const text = productClass.textContent || productClass.innerText;
+            if (text.toLowerCase().includes(searchTerm)) {
+              rows[i].style.display = "";
+            } else {
+              rows[i].style.display = "none";
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Inventory Overview</h2>
+
+      <!-- Total Stock by Product Class Section -->
+      <div class="expandable-section">
+        <button onclick="toggleSection(this)">Product Class Inventory</button>
+        <div class="expandable-content">
+          <button
+            class="export-button"
+            onclick="exportToPDF(this)"
+            data-type="class"
+          >
+            Export Product Class Inventory to PDF
+          </button>
+          <h3>Product Class Inventory</h3>
+          <div class="table-container">
+            <div class="search-bar">
+              <input
+                type="text"
+                placeholder="Search by Product Class"
+                onkeyup="filterProductsClass(this)"
+              />
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Product Class</th>
+                  <th>Total Stock</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product_class, total_stock in
+                total_stock_by_class.items() %}
+                <tr>
+                  <td>{{ product_class }}</td>
+                  <td>{{ total_stock }}</td>
+                  <td>
+                    <button onclick="toggleNestedSection(this)">
+                      View Product Inventory
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="3">
+                    <div class="nested-expandable-content">
+                      <button
+                        class="export-button"
+                        onclick="exportToPDF(this)"
+                        data-type="product"
+                      >
+                        Export Product Inventory to PDF
+                      </button>
+                      <h4>Product Inventory for {{ product_class }}</h4>
+                      <div class="search-bar">
+                        <input
+                          type="text"
+                          placeholder="Search by Product ID"
+                          onkeyup="filterProducts(this)"
+                        />
+                      </div>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Product ID</th>
+                            <th>Product Class</th>
+                            <th>Total Stock</th>
+                            <th>Unit</th>
+                            <!-- <th>Vendor Name</th> -->
+                            <th>Manufacture Date</th>
+                            <th>Expiry Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for product_id, details in products.items() %} {%
+                          if details['product_class'] == product_class %}
+                          <tr>
+                            <td>{{ product_id }}</td>
+                            <td>{{ details['product_class'] }}</td>
+                            <td>{{ details['stock'] }}</td>
+                            <td>{{ details['unit'] }}</td>
+                            <!-- <td>{{ details['vendor_name'] }}</td> -->
+                            <td>{{ details['manufacture_date'] }}</td>
+                            <td>{{ details['expiry_date'] }}</td>
+                          </tr>
+                          {% endif %} {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <a href="/enterprise_dashboard">
+        <button type="button">Go to Dashboard</button>
+      </a>
+    </div>
+  </body>
+</html>

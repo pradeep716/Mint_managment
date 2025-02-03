@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raw Material Composition</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      .button,
+      .add-item-button,
+      .add-composition-button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+      .button:hover,
+      .add-item-button:hover,
+      .add-composition-button:hover {
+        background-color: #0056b3;
+      }
+      .form-actions {
+        text-align: right;
+      }
+      .delete-button {
+        padding: 5px 10px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .delete-button:hover {
+        background-color: darkred;
+      }
+      .composition-row {
+        margin-bottom: 10px;
+      }
+      select,
+      input[type="text"],
+      input[type="number"] {
+        padding: 5px;
+      }
+      .item-container {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-bottom: 20px;
+        background-color: #fff;
+      }
+      input, select {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Raw Material Composition Entry</h1>
+
+      <label for="vendor_name">Vendor Name:</label>
+      <!-- Vendor Name (Read-only) -->
+      <input type="text" name="vendor_name" value="{{ vendor_name }}" readonly/><br/><br/>
+
+      <form action="{{ url_for('vendor_raw_material_bp.raw_material') }}" method="post">
+        <div id="items-container">
+          <div class="item-container" id="item-1">
+            <div id="composition-container-1">
+              <div class="composition-row">
+                <input type="text" 
+                       name="composition_id_1[]"
+                       placeholder="Composition ID" 
+                       required onblur="fetchCompositionData(1, this)"
+                />
+                <input
+                  type="text"
+                  name="composition_1[]"
+                  placeholder="Composition Name"
+                  required
+                />
+                <input
+                  type="text"
+                  name="composition_type_1[]"
+                  placeholder="Material Type"
+                  required
+                />
+                <input
+                  type="number"
+                  name="amount_1[]"
+                  placeholder="Amount"
+                  required
+                />
+                <select name="unit_1[]">
+                  <option value="kg">kg</option>
+                  <option value="gram">gram</option>
+                  <option value="meter">meter</option>
+                  <option value="cm">cm</option>
+                  <option value="litre">litre</option>
+                  <option value="ml">ml</option>
+                </select>
+                <button type="button" class="delete-button" onclick="deleteRow(this)">
+                  Delete
+                </button>
+              </div>
+            </div>
+            <button type="button" class="add-composition-button" onclick="addComposition(1)">
+              Add Composition
+            </button>
+            <button type="button" class="delete-button" onclick="deleteItem(1)">
+              Delete Item
+            </button>
+          </div>
+        </div>
+        <button type="button" class="add-item-button" onclick="addItem()">
+          Add New Item
+        </button>
+        <div class="form-actions">
+          <button type="submit" class="button">Submit</button>
+        </div>
+      </form>
+    </div>
+    <a href="/vendor_dashboard" class="small-button">Back to Dashboard</a>
+
+    <script>
+      let itemIdCounter = 1;
+
+      function addItem() {
+        itemIdCounter++;
+        const itemContainer = document.getElementById("items-container");
+        const newItem = document.createElement("div");
+        newItem.className = "item-container";
+        newItem.id = "item-" + itemIdCounter;
+
+        newItem.innerHTML = `
+          <div id="composition-container-${itemIdCounter}">
+            <div class="composition-row">
+              <input type="text" name="composition_id_${itemIdCounter}[]" placeholder="Composition ID" required onblur="fetchCompositionData(${itemIdCounter})">
+              <input type="text" name="composition_${itemIdCounter}[]" placeholder="Composition Name" required>
+              <input type="text" name="composition_type_${itemIdCounter}[]" placeholder="Material Type" required>
+              <input type="number" name="amount_${itemIdCounter}[]" placeholder="Amount" required>
+              <select name="unit_${itemIdCounter}[]">
+                <option value="kg">kg</option>
+                <option value="gram">gram</option>
+                <option value="meter">meter</option>
+                <option value="cm">cm</option>
+                <option value="litre">litre</option>
+                <option value="ml">ml</option>
+              </select>
+              <button type="button" class="delete-button" onclick="deleteRow(this)">Delete</button>
+            </div>
+          </div>
+          <button type="button" class="add-composition-button" onclick="addComposition(${itemIdCounter})">Add Composition</button>
+          <button type="button" class="delete-button" onclick="deleteItem(${itemIdCounter})">Delete Item</button>
+        `;
+        itemContainer.appendChild(newItem);
+      }
+
+      function addComposition(itemId) {
+        const compositionContainer = document.getElementById("composition-container-" + itemId);
+        const newRow = document.createElement("div");
+        newRow.className = "composition-row";
+        newRow.innerHTML = `
+          <input type="text" name="composition_id_${itemId}[]" placeholder="Composition ID" required onblur="fetchCompositionData(${itemId})">
+          <input type="text" name="composition_${itemId}[]" placeholder="Composition Name" required>
+          <input type="text" name="composition_type_${itemId}[]" placeholder="Material Type" required>
+          <input type="number" name="amount_${itemId}[]" placeholder="Amount" required>
+          <select name="unit_${itemId}[]">
+            <option value="kg">kg</option>
+            <option value="gram">gram</option>
+            <option value="meter">meter</option>
+            <option value="cm">cm</option>
+            <option value="litre">litre</option>
+            <option value="ml">ml</option>
+          </select>
+          <button type="button" class="delete-button" onclick="deleteRow(this)">Delete</button>
+        `;
+        compositionContainer.appendChild(newRow);
+      }
+      function fetchCompositionData(itemId, inputElement) {
+    const compositionId = inputElement.value.trim();
+    if (!compositionId) return;
+
+    fetch(`/vendor_get_composition_data?composition_id=${compositionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = inputElement.closest(".composition-row");
+                row.querySelector(`input[name='composition_${itemId}[]']`).value = data.composition_name;
+                row.querySelector(`input[name='composition_type_${itemId}[]']`).value = data.composition_type;
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching composition data:", error);
+        });
+}
+
+
+      function deleteRow(button) {
+        const row = button.parentNode;
+        row.parentNode.removeChild(row);
+      }
+
+      function deleteItem(itemId) {
+        const item = document.getElementById("item-" + itemId);
+        item.parentNode.removeChild(item);
+      }
+
+      // Function to fetch pre-filled data when item name and composition ID are entered
+      function fetchCompositionData(itemId, inputElement) {
+    const compositionId = inputElement.value.trim();
+    if (!compositionId) return;
+
+    fetch(`/vendor_get_composition_data?composition_id=${compositionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const row = inputElement.closest(".composition-row");
+                row.querySelector(`input[name='composition_${itemId}[]']`).value = data.composition_name;
+                row.querySelector(`input[name='composition_type_${itemId}[]']`).value = data.composition_type;
+                row.querySelector(`input[name='amount_${itemId}[]']`).value = data.amount;
+                row.querySelector(`select[name='unit_${itemId}[]']`).value = data.unit;
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching composition data:", error);
+        });
+}
+
+    </script>
+  </body>
+</html>

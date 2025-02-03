@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Option</title>
+</head>
+<body>
+    <h2>Choose an Option</h2>
+    <form method="POST">
+        <button type="submit" name="option" value="manufacturing">Manufacturing</button>
+        <button type="submit" name="option" value="production">Production</button>
+        <button type="submit" name="option" value="enterprise">Enterprise</button>
+    </form>
+    <a href="{{ url_for('logout_bp.logout') }}">Logout</a>
+</body>
+</html>

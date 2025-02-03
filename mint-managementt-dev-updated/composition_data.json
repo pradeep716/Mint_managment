@@ -1,0 +1,126 @@
+[
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "898976",
+                    "composition_name": "soul",
+                    "composition_type": "leather",
+                    "amount": 100,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "883465",
+                    "composition_name": "soul",
+                    "composition_type": "leather",
+                    "amount": 50,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": []
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "12345678",
+                    "composition_name": "soul",
+                    "composition_type": "leather",
+                    "amount": 300,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "987654321",
+                    "composition_name": "lase",
+                    "composition_type": "clothes",
+                    "amount": 50,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": []
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "0000000001",
+                    "composition_name": "soul",
+                    "composition_type": "leather",
+                    "amount": 20,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": []
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "123456",
+                    "composition_name": "soul",
+                    "composition_type": "leather",
+                    "amount": 200,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": []
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "sole18012025",
+                    "composition_name": "sole",
+                    "composition_type": "leather",
+                    "amount": 100,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "compositions": [
+                {
+                    "composition_id": "789456",
+                    "composition_name": "Cotton, Leather",
+                    "composition_type": "Cotton, Leather",
+                    "amount": 5,
+                    "unit": "kg"
+                }
+            ]
+        }
+    ]
+]

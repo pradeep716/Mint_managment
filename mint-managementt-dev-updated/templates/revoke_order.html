@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Revoke Order</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 80%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h2,
+      h3 {
+        text-align: center;
+        color: #333;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ddd;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 20px;
+        border-radius: 5px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        text-decoration: none;
+        color: #007bff;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Revoke Order</h2>
+
+      <!-- Orders Table -->
+      <h3>Sales Orders</h3>
+      <form method="post" action="{{ url_for('revokeOrder_bp.revoke_order') }}">
+        <table>
+          <thead>
+            <tr>
+              <th>Select</th>
+              <th>Order Number</th>
+              <th>Product Class</th>
+              <th>Product ID</th>
+              <th>Stock</th>
+              <th>Vendor Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order_id, order in orders.items() %}
+            <tr>
+              <td>
+                <input
+                  type="radio"
+                  name="order_id"
+                  value="{{ order_id }}"
+                  required
+                />
+              </td>
+              <td>{{ order_id }}</td>
+              <td>{{ order.product_class }}</td>
+              <td>{{ order.product_id }}</td>
+              <td>{{ order.stock }} {{ order.unit }}</td>
+              <td>{{ order.vendor_name }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit">Revoke Selected Order</button>
+      </form>
+
+      <a href="/enterprise_dashboard">Back to Dashboard</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100vh; /* Ensures container takes full height of the viewport */
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .card-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        width: 30%; /* Adjust for bigger cards */
+        box-sizing: border-box;
+        text-align: center;
+      }
+      .card h3 {
+        margin: 0;
+        color: #007bff;
+      }
+      .card p {
+        margin: 10px 0;
+        color: #666;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px; /* Default button size */
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px; /* Default font size */
+        text-align: center;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .small-button {
+        display: inline-block;
+        padding: 5px 10px; /* Smaller padding */
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px; /* Smaller font size */
+        text-align: center;
+      }
+      .small-button:hover {
+        background-color: #0056b3;
+      }
+      .logout-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+      @media (max-width: 1024px) {
+        .card {
+          width: 48%; /* 2 cards per row on medium screens */
+        }
+      }
+      @media (max-width: 768px) {
+        .card {
+          width: 100%; /* 1 card per row on small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome {{ username }} To Production Unit!</h1>
+      <div class="card-wrapper">
+        <div class="card">
+          <h3>production Inventory</h3>
+          <p>production Inventory</p>
+          <a href="/production_inventory" class="button"
+            >production Inventory</a
+          >
+        </div>
+        <div class="card">
+          <h3>Composition Consume Inventory</h3>
+          <p>Composition Consume Inventory</p>
+          <a href="/composition_consume_inventory" class="button"
+            >Composition Consume Inventory</a
+          >
+        </div>
+        <div class="card">
+          <h3>Consumed Items</h3>
+          <p>Consumed composition items</p>
+          <a href="/composition_consumed_item_inventory" class="button"
+            >Composition Items</a
+          >
+        </div>
+        <div class="card">
+          <h3>Return material</h3>
+          <p>write return raw material</p>
+          <a href="/return_material" class="button"> Return Material</a>
+        </div>
+
+        <div class="card">
+          <h3>Ready to move</h3>
+          <p>Move your completed items back to Enterprise inventory</p>
+          <a href="/add_to_enterprise" class="button">Ready to move</a>
+        </div>
+        <div class="card">
+          <h3>Mint Inventory</h3>
+          <p>Go to Enterprise Version</p>
+          <a href="/mint_inventory_nav" class="button">Switch To Enterprise </a>
+        </div>
+      </div>
+
+      <!-- Updated button with the small-button class -->
+      <a href="/dashboard" class="small-button">Back to Dashboard</a>
+      <a href="/logout" class="button logout-button">Logout</a>
+    </div>
+  </body>
+</html>

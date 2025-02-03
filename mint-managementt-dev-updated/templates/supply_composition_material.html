@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supply Composition Material</title>
+  <style>
+    h1 {
+      font-size: 24px;
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #555;
+    }
+    .section-content {
+      padding: 10px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .input-group {
+      margin-bottom: 10px;
+    }
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #333;
+    }
+    .input-group input, .input-group select, .input-group textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .input-group textarea {
+      resize: vertical;
+      height: 100px;
+    }
+    .buttons {
+      text-align: right;
+    }
+    .buttons .save {
+      background-color: #5abce9;
+      color: white;
+    }
+    .buttons .submit {
+      background-color: rgb(82, 82, 241);
+      color: white;
+    }
+    .reset-btn {
+      background-color: #36b8f4;
+      color: white;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+    .composition {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+    .composition.declined {
+      border: 1px solid #e74c3c;
+      background-color: #ffe6e6;
+    }
+    .composition h4 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Supply Composition Material</h1>
+
+  <!-- Quotation selection form -->
+  <form action="{{ url_for('supply_composition_material_bp.supply_composition_material') }}" method="post">
+    <div class="section">
+      <div class="section-title">Select Quotation</div>
+      <div class="section-content">
+        <div class="input-group">
+          <label for="quotation-id">Quotation ID</label>
+          <select id="quotation-id" name="quotation_id" onchange="fetchQuotationData(this.value)">
+            <option value="">--Select Quotation--</option>
+            {% for order in orders %}
+              <option value="{{ order.quotationId }}">{{ order.quotationId }} - {{ order.vendorName }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Quotation details and form if data is loaded -->
+  {% if data %}
+  <form action="{{ url_for('supply_composition_material_bp.supply_composition_material', quotation_id=data.quotationId) }}" method="post">
+    <input type="hidden" name="quotation_id" value="{{ data.quotationId }}">
+    <div class="section">
+      <div class="section-title">Vendor Information</div>
+      <div class="section-content">
+        <p><strong>Vendor Name:</strong> {{ data.vendorName }}</p>
+        <p><strong>Contact:</strong> {{ data.contactInfo }}</p>
+        <p><strong>Total Amount:</strong> ${{ data.totalAmount }}</p>
+      </div>
+    </div>
+
+    <!-- Composition details -->
+    <div class="section">
+      <div class="section-title">Order Summary</div>
+      <div class="section-content">
+        {% for composition in data.compositions %}
+          <div class="input-group composition {% if not composition.accepted %}declined{% endif %}">
+            <h4>Composition ID: {{ composition.compositionId }}</h4>
+            <p><strong>Name:</strong> {{ composition.compositionName }}</p>
+            <p><strong>Material:</strong> {{ composition.materialType }}</p>
+            <p><strong>Quantity:</strong> {{ composition.amount }} {{ composition.unit }}</p>
+            <p><strong>Status:</strong> 
+              {% if composition.accepted %}
+                Accepted
+              {% else %}
+                Declined
+              {% endif %}
+            </p>
+
+            {% if composition.accepted %}
+            <label for="dispatch-status-{{ composition.compositionId }}">Dispatch Status</label>
+            <select name="dispatch_status[{{ composition.compositionId }}]" id="dispatch-status-{{ composition.compositionId }}">
+              <option value="pending" {% if composition.dispatchStatus == 'pending' %} selected {% endif %}>Pending</option>
+              <option value="dispatched" {% if composition.dispatchStatus == 'dispatched' %} selected {% endif %}>Dispatched</option>
+              <option value="in-transit" {% if composition.dispatchStatus == 'in-transit' %} selected {% endif %}>In Transit</option>
+              <option value="delivered" {% if composition.dispatchStatus == 'delivered' %} selected {% endif %}>Delivered</option>
+            </select>
+            <button type="button" class="reset-btn" onclick="updateDispatch('{{ composition.compositionId }}')">Update Dispatch</button>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Shipping details -->
+    <div class="section">
+      <div class="section-title">Shipping Details</div>
+      <div class="section-content">
+        <div class="input-group">
+          <label for="shipment-id">Shipment ID</label>
+          <input type="text" id="shipment-id" name="shipment_id" placeholder="Enter shipment ID">
+        </div>
+        <div class="input-group">
+          <label for="carrier">Carrier Information</label>
+          <input type="text" id="carrier" name="carrier" placeholder="Enter carrier name (e.g., FedEx)">
+        </div>
+        <div class="input-group">
+          <label for="delivery-date">Expected Delivery Date</label>
+          <input type="date" id="delivery-date" name="delivery_date">
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="buttons">
+      <button type="submit" class="submit" name="submit_supply">Submit Supply</button>
+      <button type="button" onclick="window.location.href='/vendor_dashboard'">Back to Vendor Dashboard</button>
+    </div>
+  </form>
+  {% else %}
+    <p>No quotation data available. Please select a quotation.</p>
+  {% endif %}
+</div>
+
+<script>
+  function fetchQuotationData(quotationId) {
+    if (quotationId) {
+      // Redirect to fetch the quotation data
+      window.location.href = `{{ url_for('supply_composition_material_bp.supply_composition_material') }}/${quotationId}`;
+    }
+  }
+
+  function updateDispatch(compositionId) {
+    const dispatchSelect = document.getElementById(`dispatch-status-${compositionId}`);
+    const dispatchStatus = dispatchSelect.value;
+
+    fetch('/update_dispatch', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        compositionId: compositionId,
+        dispatchStatus: dispatchStatus,
+      }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Dispatch status updated successfully!');
+      } else {
+        alert('Failed to update dispatch status: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error updating dispatch status:', error);
+      alert('An error occurred while updating dispatch status.');
+    });
+  }
+</script>
+
+</body>
+</html>

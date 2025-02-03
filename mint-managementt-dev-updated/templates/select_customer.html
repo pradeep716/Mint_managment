@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Customer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 30px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        width: 300px;
+        text-align: center;
+      }
+
+      h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      label {
+        font-weight: bold;
+        color: #333;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-top: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .button:hover {
+        background-color: #0056b3;
+      }
+
+      a.button {
+        background-color: #28a745;
+      }
+
+      a.button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Select Customer</h2>
+      <form method="post" action="/add-product">
+        <label for="customer_id">Select Customer:</label><br>
+        <select id="customer_id" name="customer_id" required>
+          <option value="" disabled selected>Select a customer</option>
+          {% for customer_id, details in customers.items() %}
+            <option value="{{ customer_id }}">{{ details.name }}</option>
+          {% endfor %}
+        </select><br><br>
+        <button type="submit" class="button">Proceed to Add Product</button>
+      </form>
+      <a href="/dashboard" class="button">Back to Dashboard</a>
+    </div>
+  </body>
+</html>

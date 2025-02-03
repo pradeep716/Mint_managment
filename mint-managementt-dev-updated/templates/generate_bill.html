@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Generate Bill</title>
+    <style>
+        .container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .form-group {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .customer-details {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Generate Bill</h1>
+        <form method="post" action="/generate-bill">
+            <div class="form-group">
+                <label for="customer_name">Select Customer:</label>
+                <select id="customer_name" name="customer_name">
+                    <option value="">All</option>
+                    {% for customer_id, details in customers.items() %}
+                        <option value="{{ details.name }}" {% if selected_customer and selected_customer.name == details.name %}selected{% endif %}>{{ details.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date">
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date">
+            </div>
+
+            <div class="form-group">
+                <label for="invoice_number">Select Invoice Number:</label>
+                <select id="invoice_number" name="invoice_number">
+                    <option value="">All</option>
+                    {% for invoice in invoice_numbers %}
+                        <option value="{{ invoice }}" {% if selected_invoice_number == invoice %}selected{% endif %}>{{ invoice }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" name="generate" value="view" class="button">View Bill</button>
+            <button type="button" id="export-pdf" class="button">Export as PDF</button>
+        </form>
+
+        {% if selected_customer %}
+        <div class="customer-details">
+            <h2>Customer Details</h2>
+            <p><strong>Name:</strong> {{ selected_customer.name }}</p>
+            <p><strong>Invoice Number:</strong> {{ selected_invoice_number if selected_invoice_number else 'N/A' }}</p>
+            <p><strong>Date:</strong> {{ current_date }}</p>
+        </div>
+        {% endif %}
+
+        {% if orders %}
+        <h2>Bill Details</h2>
+        <table id="bill-details">
+            <thead>
+                <tr>
+                    <th>Serial No.</th>
+                    <th>Product Class</th>
+                    <th>Product ID</th>
+                    <th>Stock in CTN</th>
+                    <th>Price per Pair</th>
+                    <th>Total Amount in INR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.product_class }}</td>
+                    <td>{{ order.product_id }}</td>
+                    <td>{{ order.stock }}</td>
+                    <td>{{ order.price_per_pair }}</td>
+                    <td>{{ order.total_amount_inr }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><strong>Total Payable Amount:</strong> {{ total_payable_amount }}</p>
+        {% else %}
+        <p>No orders found for the selected criteria.</p>
+        {% endif %}
+
+        <a href="/enterprise_dashboard" class="button">Go Back to Dashboard</a>
+    </div>
+
+    <script>
+        // Retrieve dynamic data from the server-side context and pass it to JavaScript
+        const selectedCustomerName = "{{ selected_customer.name if selected_customer else '' }}";
+        const selectedInvoiceNumber = "{{ selected_invoice_number if selected_invoice_number else 'N/A' }}";
+        const currentDate = "{{ current_date }}";
+
+        document.getElementById("export-pdf").addEventListener("click", function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4"); // Set A4 size in mm (210 x 297 mm)
+
+            // Add title
+            doc.setFontSize(10);
+            doc.text("Generated Bill", 20, 20);
+
+            // Customer Details
+            if (selectedCustomerName) {
+                doc.setFontSize(12);
+                doc.text("Customer: " + selectedCustomerName, 20, 30);
+                doc.text("Invoice Number: " + selectedInvoiceNumber, 20, 40);
+                doc.text("Date: " + currentDate, 20, 50);
+            }
+
+            // Add table
+            const table = document.getElementById("bill-details");
+            const rows = table.querySelectorAll("tr");
+            let startY = 60;
+
+            rows.forEach((row, index) => {
+                if (index === 0) {
+                    // Add header row
+                    const headers = row.querySelectorAll("th");
+                    let startX = 20;
+                    headers.forEach(header => {
+                        doc.text(header.textContent, startX, startY);
+                        startX += 30; // Adjust spacing between columns
+                    });
+                    startY += 10; // Move to next line
+                } else {
+                    // Add data rows
+                    const cells = row.querySelectorAll("td");
+                    let startX = 20;
+                    cells.forEach(cell => {
+                        doc.text(cell.textContent, startX, startY);
+                        startX += 30;
+                    });
+                    startY += 10;
+                }
+            });
+
+            // Save the PDF
+            doc.save("bill.pdf");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Cost Prediction</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Predict Product Price</h1>
+
+        <form id="prediction-form">
+            <!-- Follow the correct sequence of features -->
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" class="form-control" id="quantity" name="Quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="sellerRating">Seller Rating</label>
+                <input type="number" step="0.1" class="form-control" id="sellerRating" name="Seller Rating" required>
+            </div>
+            <div class="form-group">
+                <label for="shippingCost">Shipping Cost</label>
+                <input type="number" class="form-control" id="shippingCost" name="Shipping Cost" required>
+            </div>
+            <div class="form-group">
+                <label for="manufacturingCost">Manufacturing Cost</label>
+                <input type="number" class="form-control" id="manufacturingCost" name="Mfg_cost" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Predict</button>
+        </form>
+
+        <div class="mt-4">
+            <h3 id="result"></h3>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#prediction-form').on('submit', function(event){
+                event.preventDefault();
+
+                // Prepare input data based on the correct sequence
+                const inputData = {
+                    'Quantity': parseInt($('#quantity').val()),
+                    'Seller Rating': parseFloat($('#sellerRating').val()),
+                    'Shipping Cost': parseFloat($('#shippingCost').val()),
+                    'Mfg_cost': parseFloat($('#manufacturingCost').val())
+                };
+
+                // Make AJAX request to the Flask app
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(inputData),
+                    success: function(response) {
+                        $('#result').text('Predicted Price: ' + response.prediction);
+                    },
+                    error: function(error) {
+                        $('#result').text('Error predicting price. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+
+    <br><br>
+          <a href="{{ url_for('dashboard_bp.dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

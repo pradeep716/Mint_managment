@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Add Product</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input,
+      select {
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px 0;
+        font-size: 16px;
+        font-weight: bold;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Add Product</h2>
+      <form method="post" action="/add-product">
+        <label for="product_class">Product Class:</label>
+        <input type="text" id="product_class" name="product_class" required />
+
+        <label for="product_id">Product ID:</label>
+        <input type="text" id="product_id" name="product_id" required />
+
+        <label for="product_state">Is the product Solid or Liquid?</label>
+        <select id="product_state" name="product_state" required>
+          <option value="Solid">Solid</option>
+          <option value="Liquid">Liquid</option>
+        </select>
+
+        <label for="stock">Stock Quantity:</label>
+        <input type="number" id="stock" name="stock" required />
+
+        <label for="unit">Unit:</label>
+        <select id="unit" name="unit" required>
+          <option value="kg">Kilograms (kg)</option>
+          <option value="g">Grams (g)</option>
+          <option value="L">Liters (L)</option>
+          <option value="ml">Milliliters (ml)</option>
+          <option value="pcs">Pieces (pcs)</option>
+        </select>
+
+        <!-- <label for="vendor_name">Vendor Name:</label>
+        <input type="text" id="vendor_name" name="vendor_name" required /> -->
+
+        <label for="manufacture_date">Manufacture Date (YYYY-MM-DD):</label>
+        <input
+          type="date"
+          id="manufacture_date"
+          name="manufacture_date"
+          required
+        />
+
+        <label for="expiry_date">Expiry Date (YYYY-MM-DD):</label>
+        <input type="date" id="expiry_date" name="expiry_date" required />
+
+        <button type="submit" class="button">Add Product</button>
+      </form>
+      <a href="/enterprise_dashboard" class="button">Back to Dashboard</a>
+    </div>
+  </body>
+</html>

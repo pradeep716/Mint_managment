@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Punch Order Details</title>
+  </head>
+  <body>
+    <h2>Enter Order Details</h2>
+    <form method="POST" enctype="multipart/form-data">
+      <!-- Client Details -->
+      <h3>Client Information</h3>
+      <!-- <label for="order_number">Order Number:</label>
+        <input type="text" id="order_number" name="order_number" required><br><br> -->
+
+      <label for="client_name">Client Name:</label>
+      <input
+        type="text"
+        id="client_name"
+        name="client_name"
+        required
+      /><br /><br />
+
+      <label for="client_email">Client Email:</label>
+      <input
+        type="email"
+        id="client_email"
+        name="client_email"
+        required
+      /><br /><br />
+
+      <label for="client_phone">Client Phone:</label>
+      <input
+        type="tel"
+        id="client_phone"
+        name="client_phone"
+        required
+      /><br /><br />
+
+      <label for="client_address">Client Address:</label>
+      <textarea id="client_address" name="client_address" required></textarea
+      ><br /><br />
+
+      <!-- Shoe Types and Quantities -->
+      <h3>Shoe Types and Quantities</h3>
+      <div id="shoe-container">
+        <div class="shoe-entry">
+          <label for="shoe_type">Shoe Type:</label>
+          <input type="text" name="shoe_type" required />
+
+          <label for="quantity">Quantity (in CTN):</label>
+          <input type="number" name="quantity" required />
+
+          <label for="key_pairs_per_ctn">Key Pairs per CTN:</label>
+          <input
+            type="number"
+            name="key_pairs_per_ctn"
+            required
+            placeholder="e.g., 2"
+          />
+
+          <label for="size_range">Size Range:</label>
+          <input
+            type="text"
+            name="size_range"
+            placeholder="e.g., 7-10"
+            required
+          />
+
+          <label for="material">Material:</label>
+          <input
+            type="text"
+            name="material"
+            placeholder="e.g., Leather"
+            required
+          />
+
+          <label for="color">Color:</label>
+          <input type="text" name="color" required /><br /><br />
+
+          <label for="custom_price">Custom Price (per unit):</label>
+          <input
+            type="number"
+            name="custom_price"
+            step="0.01"
+            placeholder="Enter price"
+            required
+          /><br /><br />
+
+          <label for="production_time">Expected Production Time (days):</label>
+          <input type="number" name="production_time" required /><br /><br />
+        </div>
+      </div>
+
+      <button type="button" onclick="addShoe()">Add Another Shoe Type</button
+      ><br /><br />
+
+      <!-- Approval Section -->
+      <h3>Order Approval</h3>
+      <label for="approval_status">Order Approved by Client:</label>
+      <input
+        type="checkbox"
+        id="approval_status"
+        name="approval_status"
+      /><br /><br />
+
+      <!-- File Attachment -->
+      <label for="order_attachments">Attach Files (optional):</label>
+      <input
+        type="file"
+        id="order_attachments"
+        name="order_attachments"
+        multiple
+      /><br /><br />
+
+      <label for="payment_terms">Payment Terms:</label>
+      <input
+        type="text"
+        id="payment_terms"
+        name="payment_terms"
+        placeholder="e.g., 50% advance"
+      /><br /><br />
+
+      <label for="additional_notes">Additional Notes:</label>
+      <textarea id="additional_notes" name="additional_notes"></textarea
+      ><br /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <button onclick="window.location.href='/manufacturing_dashboard'">
+      Back to Manufacturing Dashboard
+    </button>
+
+    <script>
+      function addShoe() {
+        var container = document.getElementById("shoe-container");
+        var newShoeEntry = document.createElement("div");
+        newShoeEntry.classList.add("shoe-entry");
+        newShoeEntry.innerHTML = `
+                <label for="shoe_type">Shoe Type:</label>
+                <input type="text" name="shoe_type" required>
+
+                <label for="quantity">Quantity (in CTN):</label>
+                <input type="number" name="quantity" required>
+
+                <label for="key_pairs_per_ctn">Key Pairs per CTN:</label>
+                <input type="number" name="key_pairs_per_ctn" required placeholder="e.g., 2">
+
+                <label for="size_range">Size Range:</label>
+                <input type="text" name="size_range" placeholder="e.g., 7-10" required>
+
+                <label for="material">Material:</label>
+                <input type="text" name="material" placeholder="e.g., Leather" required>
+
+                <label for="color">Color:</label>
+                <input type="text" name="color" required><br><br>
+
+                <label for="custom_price">Custom Price (per unit):</label>
+                <input type="number" name="custom_price" step="0.01" placeholder="Enter price" required><br><br>
+
+                <label for="production_time">Expected Production Time (days):</label>
+                <input type="number" name="production_time" required><br><br>
+            `;
+        container.appendChild(newShoeEntry);
+      }
+    </script>
+  </body>
+</html>

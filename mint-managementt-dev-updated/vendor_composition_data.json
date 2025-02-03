@@ -1,0 +1,62 @@
+[
+    [
+        {
+            "vendor_name": "liwansh",
+            "compositions": [
+                {
+                    "composition_id": "sole112",
+                    "composition_name": "sole",
+                    "composition_type": "leather",
+                    "amount": 2000,
+                    "unit": "kg",
+                    "vendor_name": "liwansh"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "vendor_name": "Rahul",
+            "compositions": [
+                {
+                    "composition_id": "123456",
+                    "composition_name": "sole",
+                    "composition_type": "leather",
+                    "amount": 100,
+                    "unit": "kg",
+                    "vendor_name": "Rahul"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "vendor_name": "Kapil",
+            "compositions": [
+                {
+                    "composition_id": "sole181738",
+                    "composition_name": "sole",
+                    "composition_type": "leather",
+                    "amount": 10000,
+                    "unit": "kg",
+                    "vendor_name": "Kapil"
+                }
+            ]
+        }
+    ],
+    [
+        {
+            "vendor_name": "Kapil",
+            "compositions": [
+                {
+                    "composition_id": "shoes12j34",
+                    "composition_name": "leare",
+                    "composition_type": "fabric",
+                    "amount": 200,
+                    "unit": "kg",
+                    "vendor_name": "Kapil"
+                }
+            ]
+        }
+    ]
+]

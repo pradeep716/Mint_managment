@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100vh; /* Ensures container takes full height of the viewport */
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .card-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        width: 30%; /* Adjust for bigger cards */
+        box-sizing: border-box;
+        text-align: center;
+      }
+      .card h3 {
+        margin: 0;
+        color: #007bff;
+      }
+      .card p {
+        margin: 10px 0;
+        color: #666;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px; /* Default button size */
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px; /* Default font size */
+        text-align: center;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .small-button {
+        display: inline-block;
+        padding: 5px 10px; /* Smaller padding */
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px; /* Smaller font size */
+        text-align: center;
+      }
+      .small-button:hover {
+        background-color: #0056b3;
+      }
+      .logout-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+      @media (max-width: 1024px) {
+        .card {
+          width: 48%; /* 2 cards per row on medium screens */
+        }
+      }
+      @media (max-width: 768px) {
+        .card {
+          width: 100%; /* 1 card per row on small screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome {{ username }}! To Manufacturing Unit</h1>
+      <div class="card-wrapper">
+        <div class="card">
+          <h3>Punch Received Order</h3>
+          <p>Add new order to Data Base.</p>
+          <a href="/punch_order" class="button">Punch Received Order</a>
+        </div>
+        <div class="card">
+          <h3>View Received Order</h3>
+          <p>view all Order</p>
+          <a href="/view_order" class="button">View Orders</a>
+        </div>
+        <div class="card">
+          <h3>Raw Material Composition Entry</h3>
+          <p>Raw Material Composition to be punch .</p>
+          <a href="/raw_material" class="button"
+            >Raw Material Composition Entry</a
+          >
+        </div>
+        <div class="card">
+          <h3>View Composition Inventory</h3>
+          <p>Total Composition Inventory</p>
+          <a href="/composition_inventory" class="button"
+            >Composition Inventory</a
+          >
+        </div>
+        <div class="card">
+          <h3>Place Order</h3>
+          <p>Raw Material Composition to be Placed</p>
+          <a href="/place_order" class="button">Place Order</a>
+        </div>
+        <div class="card">
+          <h3>View Placed Order</h3>
+          <p>View all Placed Order</p>
+          <a href="/view_placed_order" class="button">View Placed Order</a>
+        </div>
+        <!-- <div class="card">
+                <h3>Quotation vendor </h3>
+                <p>Quotation vendor will send</p>
+                <a href="/quotation_vendor" class="button">Send Quotation</a>
+            </div> -->
+        <div class="card">
+          <h3>Quotation Recived by vendor</h3>
+          <p>Quotation by the vendor</p>
+          <a href="/check_quotation" class="button">Check Quotation</a>
+        </div>
+        <!-- <div class="card">
+                <h3>Supply of Composition Material</h3>
+                <p>material supplied by vendor</p>
+                <a href="/supply_composition_material" class="button">Supply of Composition Material</a>
+            </div> -->
+        <div class="card">
+          <h3>Acknowledgement Of Supplies</h3>
+          <p>Confirm the supplies which are dileverd</p>
+          <a href="/confirm_supplies" class="button"
+            >Acknowledge the supplies
+          </a>
+        </div>
+        <!-- <div class="card">
+                <h3>Order of Composition</h3>
+                <p>Order of Composition by Manufaturer</p>
+                <a href="/order_of_composition" class="button">Order of Composition</a>
+            </div>
+            <div class="card">
+                <h3>check of Composition</h3>
+                <p>check of Composition Recived by Manufaturer</p>
+                <a href="/check_of_composition" class="button">check of Composition</a>
+            </div> -->
+        <div class="card">
+          <h3>Transfer to Production Line</h3>
+          <p>Transfer to Production Line to confirmation</p>
+          <a href="/transfer_production_line" class="button"
+            >Transfer to Production Line</a
+          >
+        </div>
+        <!-- <div class="card">
+                <h3>Composition Consume Inventory</h3>
+                <p>Composition Consume Inventory</p>
+                <a href="/composition_consume_inventory" class="button">Composition Consume Inventory</a>
+            </div>
+            <div class="card">
+                <h3>Final Product Inventory</h3>
+                <p>Final Product Inventory</p>
+                <a href="/final_product_inventory" class="button">Final Inventory</a>
+            </div>
+            <div class="card">
+                <h3>Mint Inventory</h3>
+                <p>Go to Enterprise Version</p>
+                <a href="/mint_inventory_nav" class="button">Switch To Enterprise </a>
+            </div> -->
+      </div>
+
+      <!-- Updated button with the small-button class -->
+      <a href="/dashboard" class="small-button">Back to Dashboard</a>
+      <a href="/logout" class="button logout-button">Logout</a>
+    </div>
+  </body>
+</html>

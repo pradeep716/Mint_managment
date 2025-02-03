@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Alert</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #f8d7da, #f5c6cb); /* Gradient background */
+            font-family: Arial, sans-serif;
+            position: relative; /* To position the button */
+        }
+        .alert-box {
+            padding: 20px;
+            border: 1px solid black; /* Changed border color to black */
+            color: #721c24;
+            border-radius: 5px;
+            text-align: center;
+            width: 450px; /* Adjusted width for columns */
+            height: auto; /* Adjust height to content */
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+        }
+        h1 {
+            color: red; /* Set heading color to red */
+            margin: 0 0 15px; /* Space below heading */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px; /* Space above the table */
+        }
+        th, td {
+            border: 1px solid black; /* Changed table border color to black */
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background for table header */
+        }
+        .button {
+            position: absolute; /* Position button absolutely */
+            bottom: 20px; /* Space from bottom */
+            left: 20px; /* Space from left */
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="alert-box">
+        <h1>Stock Alert!</h1>
+        <p>Products Going Out of Stock:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial No.</th>
+                    <th>Product ID</th> <!-- Added Product ID column -->
+                    <th>Product Name</th>
+                    <th>Current Stock (Units)</th> <!-- Adjusted label for stock in units -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in low_stock_items %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Serial number -->
+                        <td>{{ item.product_id }}</td> <!-- Product ID -->
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.total_stock }}</td> <!-- Total stock -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="/dashboard" class="button">Back to Dashboard</a> <!-- Button outside the alert box -->
+</body>
+</html>

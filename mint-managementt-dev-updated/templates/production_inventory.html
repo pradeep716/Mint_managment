@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Production Inventory</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      h1 {
+        text-align: center;
+      }
+      .back-link {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #007bff;
+      }
+      .search-bar {
+        margin: 20px 0;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+      .search-bar input,
+      .search-bar select {
+        width: calc(100% - 22px); /* Adjust width to fit within the container */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      .search-bar button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+      .search-bar button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <script>
+    function filterProducts(input) {
+      const searchTerm = input.value.toLowerCase();
+      const table = document.querySelector("table");
+      const rows = table.getElementsByTagName("tr");
+
+      // Start from index 1 to skip the header row
+      for (let i = 1; i < rows.length; i++) {
+        const composition_id = rows[i].getElementsByTagName("td")[0];
+        if (composition_id) {
+          const text = composition_id.textContent || composition_id.innerText;
+          if (text.toLowerCase().includes(searchTerm)) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+  <body>
+    <h1>Production Inventory</h1>
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search by Composition ID"
+        onkeyup="filterProducts(this)"
+      />
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Composition ID</th>
+          <th>Composition Name</th>
+          <th>Composition Type</th>
+          <th>Amount</th>
+          <th>Unit</th>
+          <th>Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if transferred_compositions %} {% for composition in
+        transferred_compositions %}
+        <tr>
+          <td>{{ composition.composition_id }}</td>
+          <td>{{ composition.composition_name }}</td>
+          <td>{{ composition.composition_type }}</td>
+          <td>{{ composition.amount }}</td>
+          <td>{{ composition.unit }}</td>
+          <td>{{ composition.transfer_datetime }}</td>
+        </tr>
+        {% endfor %} {% else %}
+        <tr>
+          <td colspan="6" style="text-align: center">
+            No compositions transferred yet
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+
+    <a href="/production_dashboard" class="back-link">Back to Dashboard</a>
+    <div style="display: none">
+      Debug Data: {{ transferred_compositions|tojson }}
+    </div>
+  </body>
+  <script>
+    function formatDate(dateString) {
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleString("en-US", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+      } catch (error) {
+        console.error("Error formatting date:", error);
+        return dateString; // Return original string if formatting fails
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const rows = document.querySelectorAll("tbody tr");
+      rows.forEach((row) => {
+        const dateCell = row.cells[5]; // Date is in the 6th column
+        if (dateCell) {
+          const isoDate = dateCell.textContent.trim();
+          if (isoDate) {
+            dateCell.textContent = formatDate(isoDate);
+          }
+        }
+      });
+    });
+  </script>
+  <script>
+    function fetchCompositionData() {
+      console.log("Fetching composition data..."); // Debug log
+      fetch("/production_inventory", {
+        method: "GET",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          Accept: "application/json",
+        },
+      })
+        .then((response) => {
+          console.log("Response received:", response); // Debug log
+          return response.json();
+        })
+        .then((data) => {
+          console.log("Data received:", data); // Debug log
+          const tbody = document.querySelector("tbody");
+          tbody.innerHTML = ""; // Clear existing rows
+
+          if (
+            data.transferred_compositions &&
+            data.transferred_compositions.length > 0
+          ) {
+            data.transferred_compositions.forEach((composition) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                            <td>${composition.composition_id}</td>
+                            <td>${composition.composition_name}</td>
+                            <td>${composition.composition_type}</td>
+                            <td>${composition.amount}</td>
+                            <td>${composition.unit}</td>
+                            <td>${formatDate(
+                              composition.transfer_datetime
+                            )}</td>
+                        `;
+              tbody.appendChild(row);
+            });
+          } else {
+            tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align: center">No compositions transferred yet</td>
+                        </tr>
+                    `;
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error); // Debug log
+          const tbody = document.querySelector("tbody");
+          tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center">Error loading data</td>
+                    </tr>
+                `;
+        });
+    }
+
+    // Fetch data when page loads
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchCompositionData();
+    });
+
+    // Refresh data every 30 seconds
+    setInterval(fetchCompositionData, 30000);
+  </script>
+</html>

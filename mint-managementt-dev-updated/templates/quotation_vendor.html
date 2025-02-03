@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quotation Vendor</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        .order-section, .composition-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .order-header {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .composition-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .composition-container {
+            margin-left: 20px;
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .orders-table th, .orders-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .orders-table th {
+            background-color: #f4f4f4;
+        }
+        .orders-table tr.green-row {
+            background-color: #d4edda; /* Green background for openClosedStatus false or absent */
+        }
+        .orders-table tr.red-row {
+            background-color: #f8d7da; /* Red background for openClosedStatus true */
+        }
+        .orders-table tr:hover {
+            cursor: pointer;
+            background-color: #e2e3e5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quotation Vendor</h1>
+
+    <!-- Orders Table -->
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Order Date</th>
+                <th>Quotation Status</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+            <!-- Orders will be dynamically loaded here -->
+        </tbody>
+    </table>
+
+    <!-- Hidden Form Section -->
+    <div id="formContainer" class="hidden">
+        <form id="quotationForm" action="/quotation_vendor" method="POST">
+            <!-- Hidden Order ID Field -->
+            <input type="hidden" id="hiddenOrderId" name="orderId" />
+            
+            <!-- Vendor Name and Quotation ID -->
+            <div class="order-section">
+                <label for="vendorName">Vendor Name:</label>
+                <input type="text" id="vendorName" name="vendorName" value="{{ vendor_name }}" readonly required />
+            
+                <label for="quotationId">Quotation ID:</label>
+                <input type="text" id="quotationId" name="quotationId" value="{{ vendor_name }}_PO_{{ orderIdInput }}" readonly>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      let orderIdInput = document.getElementById("orderId"); // Order ID dropdown
+      console.log(orderIdInput);
+      let quotationIdInput = document.getElementById("quotationId");
+
+      orderIdInput.addEventListener("change", function() {
+          if (this.value) {
+              quotationIdInput.value = "{{ vendor_name }}_PO_" + this.value;
+          } else {
+              quotationIdInput.value = "{{ vendor_name }}_PO_";
+          }
+      });
+  });
+</script>
+
+            
+                <label for="contactInfo">Contact Details:</label>
+                <input type="text" id="contactInfo" name="contactInfo" required />
+            </div>
+
+            <!-- Display Selected Order's Details -->
+            <div class="order-section">
+                <div id="orderDetails" style="display: none;">
+                    <h3>Order Details</h3>
+                    <p><strong>Customer Name:</strong> <span id="customerName"></span></p>
+                    <p><strong>Order Date:</strong> <span id="orderDate"></span></p>
+                    <p><strong>Delivery Date:</strong> <span id="deliveryDate"></span></p>
+                    <p><strong>Delivery Address:</strong> <span id="deliveryAddress"></span></p>
+                </div>
+            </div>
+
+            <!-- Compositions Section for the Selected Order -->
+            <div id="composition-container" class="composition-container">
+                <h3>Compositions</h3>
+                <div id="hidden-composition-fields"></div>
+            </div>
+
+            <!-- Total Quotation Amount Section -->
+            <div class="order-section">
+                <label for="totalAmount">Total Quotation Amount:</label>
+                <input type="number" id="totalAmount" name="totalAmount" placeholder="Total Quotation" readonly />
+            </div>
+
+            <button type="button" onclick="submitForm()">Submit Quotation</button>
+        </form>
+    </div>
+
+    <!-- Back to Vendor Dashboard Button -->
+    <button type="button" onclick="window.location.href='/vendor_dashboard'">Back to Vendor Dashboard</button>
+
+    <script>
+        const ordersData = JSON.parse('{{ orders | tojson | safe }}');
+
+        // Sort orders so that closed orders (openClosedStatus === true) are at the bottom
+        ordersData.sort((a, b) => {
+            if (a.openClosedStatus === true && b.openClosedStatus !== true) {
+                return 1; // Move closed orders (true) to the bottom
+            }
+            if (a.openClosedStatus !== true && b.openClosedStatus === true) {
+                return -1; // Keep open orders (false or undefined) at the top
+            }
+            return 0; // Keep the order as is if both are the same (both open or both closed)
+        });
+
+        // Populate orders table
+        const ordersTableBody = document.getElementById("ordersTableBody");
+        ordersData.forEach(order => {
+            const row = document.createElement("tr");
+            row.className = order.openClosedStatus === false || order.openClosedStatus === undefined ? "green-row" : "red-row";
+            row.innerHTML = `
+                <td>${order.orderId}</td>
+                <td>${order.customerName}</td>
+                <td>${order.orderDate}</td>
+                <td>${order.openClosedStatus === undefined ? "Opened" : (order.openClosedStatus ? "Closed" : "Opened")}</td>
+            `;
+            row.onclick = () => showForm(order);
+            ordersTableBody.appendChild(row);
+        });
+
+        function showForm(order) {
+    const formContainer = document.getElementById("formContainer");
+    formContainer.className = "hidden"; // Hide form initially
+
+    if (order.openClosedStatus === true) {
+        alert("This order is already closed.");
+        return;
+    }
+
+    // Show form if the order is open
+    formContainer.className = "visible";
+
+    // Set the orderId in the hidden input field
+    document.getElementById("hiddenOrderId").value = order.orderId;
+
+    // Update the Quotation ID dynamically
+    const vendorName = document.getElementById("vendorName").value;
+    document.getElementById("quotationId").value = vendorName + "_PO_" + order.orderId;
+
+    // Load compositions and details for the selected order
+    showCompositions(order);
+}
+
+        function showCompositions(order) {
+            const selectedOrder = order;
+
+            // Hide order details and compositions by default
+            document.getElementById("orderDetails").style.display = 'none';
+            document.getElementById("hidden-composition-fields").innerHTML = ""; // Clear previous compositions
+
+            if (selectedOrder) {
+                // Show order details
+                document.getElementById("orderDetails").style.display = 'block';
+                document.getElementById("customerName").textContent = selectedOrder.customerName;
+                document.getElementById("orderDate").textContent = selectedOrder.orderDate;
+                document.getElementById("deliveryDate").textContent = selectedOrder.deliveryDate;
+                document.getElementById("deliveryAddress").textContent = selectedOrder.deliveryAddress;
+
+                // Populate hidden fields for compositions
+                selectedOrder.composition.forEach(comp => {
+                    document.getElementById("hidden-composition-fields").innerHTML += `
+                        <div class="composition-row">
+                            <input type="hidden" name="compositionId[]" value="${comp.compositionId}">
+                            <input type="hidden" name="compositionName[]" value="${comp.compositionName}">
+                            <input type="hidden" name="materialType[]" value="${comp.materialType}">
+                            <input type="hidden" name="amount[]" value="${comp.amount}">
+                            <input type="hidden" name="unit[]" value="${comp.unit}">
+                            
+                            <p><strong>Composition ID:</strong> ${comp.compositionId}</p>
+                            <p><strong>Composition Name:</strong> ${comp.compositionName}</p>
+                            <p><strong>Material Type:</strong> ${comp.materialType}</p>
+                            <p><strong>Amount:</strong> ${comp.amount} ${comp.unit}</p>
+
+                            <!-- Price Quotation Input -->
+                            <input type="number" name="priceQuotation[]" placeholder="Price Quotation" required oninput="updateTotalQuotation()" />
+
+                            <!-- Accept or Decline Quotation -->
+                            <label>Accept:</label>
+                            <select name="acceptQuotation[]" onchange="updateTotalQuotation()">
+                                <option value="accept">Accept</option>
+                                <option value="decline">Decline</option>
+                            </select>
+                        </div>
+                    `;
+                });
+            }
+
+            updateTotalQuotation(); // Calculate total based on new composition selection
+        }
+
+        function updateTotalQuotation() {
+            let totalQuotation = 0;
+            document.querySelectorAll('.composition-row').forEach(row => {
+                const price = parseFloat(row.querySelector("input[name='priceQuotation[]']").value) || 0;
+                const isAccepted = row.querySelector("select[name='acceptQuotation[]']").value === "accept";
+
+                if (isAccepted) {
+                    totalQuotation += price;
+                }
+            });
+
+            document.getElementById("totalAmount").value = totalQuotation.toFixed(2);
+        }
+
+        function submitForm() {
+            document.getElementById("quotationForm").submit();
+        }
+    </script>
+</body>
+</html>

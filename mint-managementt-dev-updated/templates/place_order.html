@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Place Order</title>
+    <style>
+      h1 {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Place Order</h1>
+    <form action="/place_order_form" method="POST">
+      <!-- <div>
+        <label for="orderId">Order ID</label>
+        <input
+          type="text"
+          id="orderId"
+          name="orderId"
+          placeholder="Enter Order ID"
+          required
+        />
+      </div> -->
+
+      <div>
+        <label for="customerName">Customer Name</label>
+        <input
+          type="text"
+          id="customerName"
+          name="customerName"
+          placeholder="Enter customer name"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="customerEmail">Customer Email</label>
+        <input
+          type="email"
+          id="customerEmail"
+          name="customerEmail"
+          placeholder="Enter customer email"
+          required
+        />
+      </div>
+
+      <div>
+        <label for="orderDate">Order Date</label>
+        <input type="date" id="orderDate" name="orderDate" required />
+      </div>
+
+      <!-- Dynamic Composition Section -->
+      <div id="composition-container">
+        <h3>Compositions</h3>
+        <div class="composition-row" id="composition-1">
+          <input
+            type="text"
+            name="compositionId[]"
+            placeholder="Composition ID"
+            required
+            onblur="fetchCompositionData(this.value)"
+          />
+          <input
+            type="text"
+            name="compositionName[]"
+            placeholder="Composition Name"
+            required
+          />
+          <input
+            type="text"
+            name="materialType[]"
+            placeholder="Material Type"
+            required
+          />
+          <input type="number" name="amount[]" placeholder="Amount" required />
+          <select name="unit[]">
+            <option value="kg">kg</option>
+            <option value="gram">gram</option>
+            <option value="meter">meter</option>
+            <option value="cm">cm</option>
+            <option value="litre">litre</option>
+            <option value="ml">ml</option>
+          </select>
+          <button
+            type="button"
+            class="delete-composition"
+            onclick="removeComposition(this)"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <button type="button" onclick="addComposition()">Add Composition</button>
+
+      <div>
+        <label for="deliveryDate">Delivery Date</label>
+        <input type="date" id="deliveryDate" name="deliveryDate" required />
+      </div>
+
+      <!-- <div>
+        <label for="orderStatus">Order Status</label>
+        <select id="orderStatus" name="orderStatus" required>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+        </select>
+      </div> -->
+
+      <div>
+        <label for="deliveryAddress">Delivery Address</label>
+        <textarea
+          id="deliveryAddress"
+          name="deliveryAddress"
+          placeholder="Enter delivery address"
+          rows="4"
+          required
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority" required>
+          <option value="high">HIGH</option>
+          <option value="medium">MEDIUM</option>
+          <option value="low">LOW</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="rawMaterialRequirements">Raw Material Requirements</label>
+        <textarea
+          id="rawMaterialRequirements"
+          name="rawMaterialRequirements"
+          placeholder="Enter raw material requirements if any"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="notes">Additional Notes/Instructions</label>
+        <textarea
+          id="notes"
+          name="notes"
+          placeholder="Enter any special instructions"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px">
+        <button type="submit">Place Order</button>
+        <button type="reset" class="button-reset">Reset</button>
+      </div>
+    </form>
+    <button onclick="window.location.href='/manufacturing_dashboard'">
+      Back to Manufacturing Dashboard
+    </button>
+
+    <script>
+      // Function to add a new composition row
+      function addComposition() {
+        const compositionContainer = document.getElementById(
+          "composition-container"
+        );
+        const newIndex = compositionContainer.children.length + 1;
+
+        const newComposition = document.createElement("div");
+        newComposition.className = "composition-row";
+        newComposition.id = `composition-${newIndex}`;
+        newComposition.innerHTML = `
+          <input 
+            type="text" 
+            name="compositionId[]" 
+            placeholder="Composition ID" 
+            required 
+            onblur="fetchCompositionData(this.value)"
+          />
+          <input type="text" name="compositionName[]" placeholder="Composition Name" required />
+          <input type="text" name="materialType[]" placeholder="Material Type" required />
+          <input type="number" name="amount[]" placeholder="Amount" required />
+          <select name="unit[]">
+            <option value="kg">kg</option>
+            <option value="gram">gram</option>
+            <option value="meter">meter</option>
+            <option value="cm">cm</option>
+            <option value="litre">litre</option>
+            <option value="ml">ml</option>
+          </select>
+          <button type="button" class="delete-composition" onclick="removeComposition(this)">Remove</button>
+        `;
+
+        compositionContainer.appendChild(newComposition);
+      }
+
+      // Function to remove a composition row
+      function removeComposition(button) {
+        button.parentElement.remove();
+      }
+      function fetchCompositionData(compositionId) {
+        // Use the compositionId parameter directly since it's passed from the input
+        if (!compositionId) {
+          return;
+        }
+
+        console.log(`Fetching data for composition ID: ${compositionId}`);
+
+        fetch(`/get_composition_data?composition_id=${compositionId}`)
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              return response.json().then((err) => {
+                throw new Error(err.message || "Composition not found");
+              });
+            }
+            return response.json();
+          })
+          .then((data) => {
+            //console.log("Received data:", data);
+            if (data.success) {
+              // Find the input element that triggered this function
+              const compositionIdField =
+                document.activeElement ||
+                document.querySelector(
+                  `input[name='compositionId[]'][value='${compositionId}']`
+                );
+              // Get the parent row
+              const row = compositionIdField.closest(".composition-row");
+              // Update the fields in the same row
+              row.querySelector(`input[name='compositionName[]']`).value =
+                data.composition_name;
+              row.querySelector(`input[name='materialType[]']`).value =
+                data.composition_type;
+              row.querySelector(`input[name='amount[]']`).value = data.amount;
+              row.querySelector(`select[name='unit[]']`).value = data.unit;
+            }
+          })
+          .catch((error) => {
+            console.error("Error details:", error);
+            //alert("Could not find composition with the specified ID");
+          });
+      }
+    </script>
+  </body>
+</html>

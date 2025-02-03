@@ -1,0 +1,18 @@
+[
+    [
+        {
+            "composition_id": "comp-1",
+            "composition_name": "abc",
+            "composition_type": "abc",
+            "amount": 22,
+            "unit": "litre"
+        },
+        {
+            "composition_id": "123456",
+            "composition_name": "soul",
+            "composition_type": "leather",
+            "amount": 100,
+            "unit": "kg"
+        }
+    ]
+]

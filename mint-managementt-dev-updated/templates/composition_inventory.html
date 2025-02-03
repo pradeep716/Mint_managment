@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Composition Inventory</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      h1 {
+        text-align: center;
+      }
+      .search-bar {
+        margin: 20px 0;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+      .search-bar input,
+      .search-bar select {
+        width: calc(100% - 22px); /* Adjust width to fit within the container */
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      .search-bar button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+      }
+      .search-bar button:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <script>
+    function filterProducts(input) {
+      const searchTerm = input.value.toLowerCase();
+      const table = document.querySelector("table");
+      const rows = table.getElementsByTagName("tr");
+
+      // Start from index 1 to skip the header row
+      for (let i = 1; i < rows.length; i++) {
+        const composition_id = rows[i].getElementsByTagName("td")[0];
+        if (composition_id) {
+          const text = composition_id.textContent || composition_id.innerText;
+          if (text.toLowerCase().includes(searchTerm)) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+  <body>
+    <h1>View Composition Inventory</h1>
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search by Product ID"
+        onkeyup="filterProducts(this)"
+      />
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Composition ID</th>
+          <th>Composition Name</th>
+          <th>Composition Type</th>
+          <th>Amount</th>
+          <th>Unit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %} {% for composition in order.compositions %}
+        <tr>
+          <td>{{ composition.composition_id }}</td>
+          <td>{{ composition.composition_name }}</td>
+          <td>{{ composition.composition_type }}</td>
+          <td>{{ composition.amount }}</td>
+          <td>{{ composition.unit }}</td>
+        </tr>
+        {% endfor %} {% endfor %}
+      </tbody>
+    </table>
+
+    <a href="/manufacturing_dashboard">Back to Dashboard</a>
+
+    <div style="display: none">Debug Data: {{ orders|tojson }}</div>
+  </body>
+</html>

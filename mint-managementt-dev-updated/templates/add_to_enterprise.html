@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>Add Item Details</h2>
+    <form method="POST">
+      <label for="product_class">Product Class:</label>
+      <input
+        type="text"
+        id="product_class"
+        name="product_class"
+        required
+      /><br /><br />
+
+      <label for="product_id">Product Id:</label>
+      <input
+        type="text"
+        id="product_id"
+        name="product_id"
+        required
+      /><br /><br />
+      <label for="product_state">Is the product Solid or Liquid?</label>
+      <select id="product_state" name="product_state" required>
+        <option value="Solid">Solid</option>
+        <option value="Liquid">Liquid</option>
+      </select>
+      <br /><br />
+      <label for="stock">Stock(in CTN):</label>
+      <input type="number" id="stock" name="stock" required /><br /><br />
+
+      <label for="keypair">KeyPair:</label>
+      <input type="number" id="keypair" name="keypair" required /><br /><br />
+
+      <label for="unit">Unit:</label>
+      <select id="unit" name="unit" required>
+        <option value="kg">Kilograms (kg)</option>
+        <option value="g">Grams (g)</option>
+        <option value="L">Liters (L)</option>
+        <option value="ml">Milliliters (ml)</option>
+        <option value="pcs">Pieces (pcs)</option>
+      </select>
+
+      <br /><br />
+
+      <!-- <label for="vendor_name">Vendor Name</label>
+      <input
+        type="text"
+        id="vendor_name"
+        name="vendor_name"
+        disabled
+      /><br /><br /> -->
+
+      <label for="manufacturing_date">Manufacturing Date</label>
+      <input
+        type="date"
+        id="manufacturing_date"
+        name="manufacturing_date"
+      /><br /><br />
+
+      <br /><br />
+      <label for="expiry_date">Expiry Date</label>
+      <input type="date" id="expiry_date" name="expiry_date" /><br /><br />
+
+      <br /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <button onclick="window.location.href='/production_dashboard'">
+      Back to Production Dashboard
+    </button>
+  </body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        width: 80%;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #333;
+      }
+
+      select,
+      button {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      canvas {
+        margin-top: 30px;
+      }
+
+      .back-to-dashboard {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .back-to-dashboard button {
+        background-color: #28a745;
+        padding: 10px 20px;
+      }
+
+      .back-to-dashboard button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Sales Analytics</h1>
+
+      <form method="post" action="/sales-analytics">
+        <label for="graph_type">Select Graph Type:</label>
+        <select name="graph_type" id="graph_type">
+          <option value="bar">Bar</option>
+          <option value="line">Line</option>
+          <option value="pie">Pie</option>
+        </select>
+
+        <label for="time_frame">Select Time Frame:</label>
+        <select name="time_frame" id="time_frame">
+          <option value="monthly">Monthly</option>
+          <option value="weekly">Weekly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+
+        <label for="product_class">Select Product Class:</label>
+        <select
+          name="product_class"
+          id="product_class"
+          onchange="filterProducts()"
+        >
+          <option value="" selected>All</option>
+          {% for cls in product_classes %}
+          <option value="{{ cls }}">{{ cls }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="product_id">Select Product ID:</label>
+        <select name="product_id" id="product_id">
+          <option value="" selected>All</option>
+          {% for id, details in products.items() %}
+          <option value="{{ id }}">{{ id }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="unit">Select Unit:</label>
+        <select name="unit" id="unit">
+          <option value="kg" selected>Kilograms (kg)</option>
+          <option value="g">Grams (g)</option>
+          <option value="L">Liters (L)</option>
+          <option value="ml">Milliliters (ml)</option>
+          <option value="pcs">Pieces(pcs)</option>
+        </select>
+
+        <button type="submit">Update</button>
+      </form>
+
+      <canvas id="salesChart" width="400" height="200"></canvas>
+
+      <script>
+        let chart;
+
+        function initializeChart() {
+          const ctx = document.getElementById("salesChart").getContext("2d");
+          const chartType = "{{ graph_type }}";
+          const chartData = JSON.parse("{{ chart_data | tojson | safe }}");
+
+          console.log("Chart Type:", chartType);
+          console.log("Chart Data:", chartData);
+
+          // Destroy existing chart if it exists
+          if (chart) {
+            chart.destroy();
+          }
+
+          const colors = chartData.labels.map(
+            () =>
+              `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(
+                Math.random() * 255
+              )}, ${Math.floor(Math.random() * 255)}, 0.2)`
+          );
+
+          const borderColors = colors.map((color) => color.replace("0.2", "1"));
+
+          chart = new Chart(ctx, {
+            type: chartType,
+            data: {
+              labels: chartData.labels,
+              datasets: [
+                {
+                  label: "Sales ({{ selected_unit }})",
+                  data: chartData.values,
+                  backgroundColor:
+                    chartType === "pie" ? colors : "rgba(75, 192, 192, 0.2)",
+                  borderColor:
+                    chartType === "pie"
+                      ? borderColors
+                      : "rgba(75, 192, 192, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              scales:
+                chartType !== "pie"
+                  ? {
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: "Amount ({{ selected_unit }})",
+                        },
+                      },
+                    }
+                  : {},
+              plugins: {
+                legend: {
+                  display: true,
+                },
+                title: {
+                  display: true,
+                  text: "Sales Analytics",
+                },
+              },
+            },
+          });
+        }
+
+        // Add this function
+        function resetForm() {
+          document.getElementById("graph_type").value = "bar";
+          document.getElementById("time_frame").value = "monthly";
+          document.getElementById("product_class").value = "";
+          document.getElementById("product_id").value = "";
+          document.getElementById("unit").value = "kg";
+        }
+
+        // Call it when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+          resetForm();
+          initializeChart();
+        });
+
+        function filterProducts() {
+          const productClass = document.getElementById("product_class").value;
+          const productSelect = document.getElementById("product_id");
+
+          productSelect.innerHTML = '<option value="">All</option>'; // Reset options
+
+          const products = JSON.parse("{{ products | tojson | safe }}");
+
+          for (const [productId, details] of Object.entries(products)) {
+            if (details.product_class === productClass) {
+              const option = document.createElement("option");
+              option.value = productId;
+              option.textContent = productId;
+              productSelect.appendChild(option);
+            }
+          }
+        }
+      </script>
+
+      <div class="back-to-dashboard">
+        <form
+          action="{{ url_for('enterprise_dashboard_bp.dashboard') }}"
+          method="get"
+        >
+          <button type="submit">Back to Dashboard</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

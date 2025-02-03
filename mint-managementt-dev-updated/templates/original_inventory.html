@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>View Inventory</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        .expandable-section {
+            margin-bottom: 20px;
+        }
+        .expandable-section button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .expandable-section button:hover {
+            background-color: #0056b3;
+        }
+        .expandable-content, .nested-expandable-content {
+            display: none;
+            margin-top: 10px;
+        }
+        .expandable-content table, .nested-expandable-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .expandable-content table th, .expandable-content table td,
+        .nested-expandable-content table th, .nested-expandable-content table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .expandable-content table th {
+            background-color: #f4f4f4;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        function toggleSection(button) {
+            var content = button.nextElementSibling;
+            var isExpanded = content.style.display === "block";
+
+            // Close all expandable sections
+            document.querySelectorAll('.expandable-content').forEach(function(section) {
+                section.style.display = 'none';
+                section.previousElementSibling.textContent = "Expand Section";
+            });
+
+            // If it was not expanded, open it
+            if (!isExpanded) {
+                content.style.display = 'block';
+                button.textContent = "Collapse Section";
+            }
+        }
+
+        function toggleNestedSection(button) {
+            var row = button.closest('tr').nextElementSibling;
+            var content = row.querySelector('.nested-expandable-content');
+            var isExpanded = content.style.display === "block";
+
+            // Toggle the nested expandable content
+            if (isExpanded) {
+                content.style.display = 'none';
+                button.textContent = "View Product Inventory";
+            } else {
+                content.style.display = 'block';
+                button.textContent = "Hide Product Inventory";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Inventory Overview</h2>
+
+        <!-- Total CTN by Product Class Section -->
+        <div class="expandable-section">
+            <button onclick="toggleSection(this)">Product Class Inventory</button>
+            <div class="expandable-content">
+                <h3>Product Class Inventory</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Class</th>
+                            <th>Total CTN</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product_class, total_ctn in total_ctn_by_class.items() %}
+                            <tr>
+                                <td>{{ product_class }}</td>
+                                <td>{{ total_ctn }}</td>
+                                <td><button onclick="toggleNestedSection(this)">View Product Inventory</button></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="nested-expandable-content">
+                                        <h4>Product Inventory for {{ product_class }}</h4>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Product ID</th>
+                                                    <th>Product Class</th>
+                                                    <th>Stock (CTN)</th>
+                                                    <th>Price per Pair (INR)</th>
+                                                    <th>Key Pair</th>
+                                                    <th>Original Stock</th>
+                                                    <th>Current Stock</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for product_id, details in products.items() %}
+                                                    {% if details.product_class == product_class %}
+                                                        <tr>
+                                                            <td>{{ product_id }}</td>
+                                                            <td>{{ details.product_class }}</td>
+                                                            <td>{{ details.stock_ctn }}</td>
+                                                            <td>{{ details.price_per_pair }}</td>
+                                                            <td>{{ details.key_pair if details.key_pair else 'N/A' }}</td>
+                                                            <td>{{ details.stock_ctn }}</td> <!-- Original Stock -->
+                                                            <td>{{ current_stock.get(product_id, details.stock_ctn) }}</td> <!-- Current Stock -->
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Order History Section -->
+
+        <!-- Sales Orders Section -->
+        <div class="expandable-section">
+            <button onclick="toggleSection(this)">Order History</button>
+            <div class="expandable-content">
+                <h3>Order History</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Product ID</th>
+                            <th>Stock to Sell (CTN)</th>
+                            <th>Price</th>
+                            <th>Employee ID</th>
+                            <th>Date & Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order_id, order in orders.items() %}
+                            <tr>
+                                <td>{{ order_id }}</td>
+                                <td>{{ order.customer_name }}</td>
+                                <td>{{ order.product_id }}</td>
+                                <td>{{ order.stock_to_sell }}</td> <!-- Updated field -->
+                                <td>${{ order.price }}</td>
+                                <td>{{ order.employee_id }}</td>
+                                <td>{{ order.date_time }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <a href="/dashboard">Back to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acknowledge Supplies</title>
+  <style>
+    h1 { font-size: 24px; color: #333; text-align: center; margin-bottom: 20px; }
+    .section { margin-bottom: 20px; }
+    .section-title { font-size: 18px; color: #555; }
+    .section-content { padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; }
+    .input-group { margin-bottom: 20px; }
+    .input-group h4 { font-size: 16px; color: #333; margin-bottom: 5px; }
+    .input-group p { margin: 5px 0; font-size: 14px; }
+    .buttons { text-align: right; }
+    .acknowledge-button { 
+      padding: 8px 15px; 
+      font-size: 14px; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      background-color: #4caf50; 
+      color: white; 
+    }
+    .acknowledged-button { 
+      background-color: #ccc; 
+      color: #000; 
+    }
+    .disabled-button {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Acknowledge Supplies</h1>
+
+  <div class="section">
+    <div class="section-title">Select Shipment ID</div>
+    <div class="section-content">
+      <select id="shipment-dropdown">
+        <option value="">Select Shipment</option>
+        <!-- Shipment options will be populated dynamically -->
+        {% for shipment_id in shipment_ids %}
+          <option value="{{ shipment_id }}">{{ shipment_id }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div id="shipment-details" class="section">
+    <!-- Shipment details will appear here after selecting a shipment ID -->
+  </div>
+  <button onclick="window.location.href='/manufacturing_dashboard'">Back to Manufacturing Dashboard</button>
+
+  <script>
+    document.getElementById('shipment-dropdown').addEventListener('change', function() {
+      const shipmentId = this.value;
+      if (shipmentId) {
+        fetch(`/confirm_supplies?shipment_id=${shipmentId}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              document.getElementById('shipment-details').innerHTML = `<p>Error: ${data.error}</p>`;
+            } else {
+              const { shipment_id, carrier, delivery_date, vendor_name, compositions } = data;
+              let html = `
+                <div class="section-title">Shipment Information</div>
+                <div class="section-content">
+                  <p><strong>Shipment ID:</strong> ${shipment_id}</p>
+                  <p><strong>Carrier:</strong> ${carrier}</p>
+                  <p><strong>Delivery Date:</strong> ${delivery_date}</p>
+                </div>
+                <div class="section-title">Composition Details</div>
+                <div class="section-content">`;
+
+              compositions.forEach(composition => {
+                const isDelivered = composition.dispatchStatus === "delivered";
+                const isNotAcknowledged = !composition.acknowledged;
+                html += `
+                  <div class="input-group" id="composition-${composition.compositionId}">
+                    <h4>Composition ID: ${composition.compositionId}</h4>
+                    <p><strong>Name:</strong> ${composition.compositionName}</p>
+                    <p><strong>Material Type:</strong> ${composition.materialType}</p>
+                    <p><strong>Amount:</strong> ${composition.amount} ${composition.unit}</p>
+                    <p><strong>Price :</strong> Rs ${composition.priceQuotation}</p>
+                    <p><strong>Dispatch Status:</strong> ${composition.dispatchStatus}</p>
+                    <button 
+                      class="acknowledge-button ${(!isDelivered || !isNotAcknowledged) ? 'disabled-button' : ''}"
+                      ${(!isDelivered || !isNotAcknowledged) ? 'disabled' : ''}
+                      onclick="${(isDelivered && isNotAcknowledged) ? `acknowledgeSupply('${composition.compositionId}', '${shipment_id}')` : 'showNotDeliveredPopup()'}">
+                      ${composition.acknowledged ? 'Acknowledged' : 'Acknowledge'}
+                    </button>
+                  </div>`;
+              });
+
+              html += '</div>';
+              document.getElementById('shipment-details').innerHTML = html;
+            }
+          });
+      }
+    });
+
+    function acknowledgeSupply(compositionId, shipmentId) {
+      const button = document.querySelector(`#composition-${compositionId} .acknowledge-button`);
+      button.disabled = true;
+      button.textContent = 'Processing...';
+
+      fetch('/update_acknowledgment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ compositionId, shipmentId }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          button.textContent = 'Acknowledged';
+          button.classList.add('acknowledged-button');
+          button.disabled = true;
+        } else {
+          alert(`Error: ${data.error}`);
+          button.disabled = false;
+          button.textContent = 'Acknowledge';
+        }
+      })
+      .catch(error => {
+        alert(`Error: ${error.message}`);
+        button.disabled = false;
+        button.textContent = 'Acknowledge';
+      });
+    }
+
+    function showNotDeliveredPopup() {
+      alert("This composition cannot be acknowledged until it is delivered.");
+    }
+  </script>
+</body>
+</html>

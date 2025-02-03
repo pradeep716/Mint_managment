@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100vh; /* Ensures container takes full height of the viewport */
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .card-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 10px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        width: 23%; /* Adjust for 4 cards per row */
+        box-sizing: border-box;
+        text-align: center;
+      }
+      .card h3 {
+        margin: 0;
+        color: #007bff;
+      }
+      .card p {
+        margin: 10px 0;
+        color: #666;
+      }
+      .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 16px;
+        text-align: center;
+      }
+      .button:hover {
+        background-color: #0056b3;
+      }
+      .small-button {
+        display: inline-block;
+        padding: 5px 10px; /* Smaller padding */
+        margin: 10px 0;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px; /* Smaller font size */
+        text-align: center;
+      }
+      .small-button:hover {
+        background-color: #0056b3;
+      }
+      .logout-button {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+      }
+      @media (max-width: 1024px) {
+        .card {
+          width: 32%; /* 3 cards per row */
+        }
+      }
+      @media (max-width: 768px) {
+        .card {
+          width: 48%; /* 2 cards per row */
+        }
+      }
+      @media (max-width: 480px) {
+        .card {
+          width: 100%; /* 1 card per row */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome, {{ username }}! To Enterprises</h1>
+      <div class="card-wrapper">
+        <div class="card">
+          <h3>Add Product</h3>
+          <p>Add new products to the inventory.</p>
+          <a href="/add-product" class="button">Add Product</a>
+        </div>
+        <div class="card">
+          <h3>View Inventory</h3>
+          <p>View all available products.</p>
+          <a href="/view-inventory" class="button">View Inventory</a>
+        </div>
+        <div class="card">
+          <h3>Punch Order</h3>
+          <p>Record a new order.</p>
+          <a href="/enterprise-punch-order" class="button">Punch Order</a>
+        </div>
+        <div class="card">
+          <h3>Revoke Order</h3>
+          <p>Cancel an existing order.</p>
+          <a href="/revoke-order" class="button">Revoke Order</a>
+        </div>
+        <div class="card">
+          <h3>Defective Product</h3>
+          <p>Report a defective product.</p>
+          <a href="/defective-product" class="button">Defective Product</a>
+        </div>
+        <!-- <div class="card">
+          <h3>Sales Analytics</h3>
+          <p>View sales performance and analytics.</p>
+          <a href="/sales-analytics" class="button">Sales Analytics</a>
+        </div> -->
+        <div class="card">
+          <h3>Add Customer</h3>
+          <p>Add new customers to the system.</p>
+          <a href="/add-customer" class="button">Add Customer</a>
+        </div>
+        <div class="card">
+          <h3>Generate Bill</h3>
+          <p>Generate bill to the system.</p>
+          <a href="/generate-bill" class="button">Generate Bill</a>
+        </div>
+        <div class="card">
+          <h3>Order Summary</h3>
+          <p>Generate summary to the system.</p>
+          <a href="/order-summary" class="button">Order Summary</a>
+        </div>
+        <!-- <div class="card">
+          <h3>Price Prediction</h3>
+          <p>Generate price for product.</p>
+          <a href="/price-prediction" class="button">Price Prediction</a>
+        </div>
+        <div class="card">
+          <h3>Sales Prediction</h3>
+          <p>Generate sales forecast.</p>
+          <a href="/consume-prediction" class="button">Sales Prediction</a>
+        </div> -->
+      </div>
+      <a href="/dashboard" class="small-button">Back to Dashboard</a>
+      <a href="/logout" class="button logout-button">Logout</a>
+    </div>
+  </body>
+</html>

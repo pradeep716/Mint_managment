@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check Quotation</title>
+    <style>
+        /* Original styles as provided */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            color: #38a9c5;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+        }
+        .sidebar h2 {
+            color: black;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        .main-content {
+            margin-left: 270px;
+            padding: 20px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .quotation-details p {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .composition-item {
+            border-top: 1px solid #ddd;
+            padding: 15px 0;
+        }
+        .composition-item:first-child {
+            border-top: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Quotation Management</h2>
+        <label for="quotationId" style="color: black;">Select Quotation ID:</label>
+        <select id="quotationId" onchange="showQuotationDetails()" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 5px;">
+            <option value="">Select a Quotation</option>
+            {% for quotation in quotations %}
+                <option value="{{ quotation['quotationId'] }}">Quotation ID: {{ quotation['quotationId'] }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="window.location.href='/manufacturing_dashboard'">Back to Manufacturing Dashboard</button>
+    </div>
+    
+    <div class="main-content">
+        <h1>Check Quotation</h1>
+
+        <div id="quotationDetailsCard" class="card quotation-details" style="display: none;">
+            <h2>Quotation Details</h2>
+            <p><strong>Vendor Name:</strong> <span id="vendorName"></span></p>
+            <p><strong>Contact Info:</strong> <span id="contactInfo"></span></p> <!-- New Contact Info Field -->
+            <p><strong>Total Quotation:</strong> <span id="totalQuotation"></span></p>
+        </div>
+
+        <div id="compositionDetailsCard" class="card" style="display: none;">
+            <h2>Compositions</h2>
+            <div id="compositionsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const quotationsData = JSON.parse('{{ quotations | tojson | safe }}');
+
+        function showQuotationDetails() {
+            const quotationId = document.getElementById("quotationId").value;
+            const quotationDetailsCard = document.getElementById("quotationDetailsCard");
+            const compositionDetailsCard = document.getElementById("compositionDetailsCard");
+            const compositionsContainer = document.getElementById("compositionsContainer");
+
+            compositionsContainer.innerHTML = '';
+
+            if (quotationId) {
+                const selectedQuotation = quotationsData.find(q => q.quotationId === quotationId);
+
+                if (selectedQuotation) {
+                    document.getElementById("vendorName").textContent = selectedQuotation.vendorName;
+                    document.getElementById("contactInfo").textContent = selectedQuotation.contactInfo; // Display Contact Info
+                    document.getElementById("totalQuotation").textContent = selectedQuotation.totalAmount;
+
+                    selectedQuotation.compositions.forEach((composition, index) => {
+                        const compositionItem = document.createElement("div");
+                        compositionItem.classList.add("composition-item");
+                        compositionItem.innerHTML = `
+                            <p><strong>Composition ID:</strong> ${composition.compositionId}</p>
+                            <p><strong>Composition Name:</strong> ${composition.compositionName}</p>
+                            <p><strong>Material Type:</strong> ${composition.materialType}</p>
+                            <p><strong>Amount:</strong> ${composition.amount} ${composition.unit}</p>
+                            <p><strong>Price Quotation:</strong> ${composition.priceQuotation}</p>
+                            <p><strong>Status:</strong> <span id="status-${index}">${composition.accepted ? 'Accepted' : 'Declined'}</span></p>
+                            <button onclick="updateStatus('${quotationId}', ${index}, true)">Accept</button>
+                            <button onclick="updateStatus('${quotationId}', ${index}, false)">Reject</button>
+                        `;
+                        compositionsContainer.appendChild(compositionItem);
+                    });
+
+                    quotationDetailsCard.style.display = 'block';
+                    compositionDetailsCard.style.display = 'block';
+                } else {
+                    quotationDetailsCard.style.display = 'none';
+                    compositionDetailsCard.style.display = 'none';
+                }
+            } else {
+                quotationDetailsCard.style.display = 'none';
+                compositionDetailsCard.style.display = 'none';
+            }
+        }
+
+        function updateStatus(quotationId, compositionIndex, isAccepted) {
+            fetch('/update_composition_status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quotationId: quotationId,
+                    compositionIndex: compositionIndex,
+                    accepted: isAccepted
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`status-${compositionIndex}`).textContent = isAccepted ? 'Accepted' : 'Declined';
+                } else {
+                    alert("Failed to update status");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>

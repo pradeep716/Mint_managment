@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Acknowledgment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .order-card {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .composition-list {
+            margin-top: 15px;
+        }
+
+        .composition-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .composition-item h4 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+
+        .composition-item p {
+            margin: 5px 0;
+        }
+
+        .acknowledged {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        table.order-table {
+        width: 100%; /* Makes the table take up full width */
+        border-collapse: collapse; /* Ensures borders don't overlap */
+        margin-top: 20px; /* Adds space above the table */
+    }
+
+    table.order-table th, table.order-table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    table.order-table th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    table.order-table td {
+        background-color: #fff;
+    }
+    
+    table.order-table th {
+        background-color: #007bff; /* Blue background */
+        color: white; /* White text color */
+        font-weight: bold;
+    }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Vendor Acknowledgment</h1>
+
+    {% if orders %}
+        <table border="1" class="order-table">
+            <thead>
+                <tr>
+                    <th>Vendor Name</th>
+                    <th>Quotation ID</th>
+                    <th>Shipment ID</th>
+                    <th>Carrier</th>
+                    <th>Delivery Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order['vendor_name'] }}</td>
+                        <td>{{ order['quotation_id'] }}</td>
+                        <td>{{ order['shipment_id'] }}</td>
+                        <td>{{ order['carrier'] }}</td>
+                        <td>{{ order['delivery_date'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="composition-list">
+            {% for order in orders %}
+                {% for composition in order['compositions'] %}
+                    {% if composition.get('acknowledged') == true %}
+                        <div class="composition-item acknowledged">
+                            <h4>Composition: {{ composition['compositionName'] }}</h4>
+                            <p><strong>Composition ID:</strong> {{ composition['compositionId'] }}</p>
+                            <p><strong>Material Type:</strong> {{ composition['materialType'] }}</p>
+                            <p><strong>Amount:</strong> {{ composition['amount'] }} {{ composition['unit'] }}</p>
+                            <p><strong>Price Quotation:</strong> ${{ composition['priceQuotation'] }}</p>
+                            <p><strong>Dispatch Status:</strong> {{ composition['dispatchStatus'] }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No orders available for your account.</p>
+    {% endif %}
+
+    <a href="/vendor_dashboard" class="button">Back to Vendor Dashboard</a>
+</body>
+</html>
